@@ -2,8 +2,8 @@
 Description=My .NET Web App
 
 [Service]
-WorkingDirectory=/home/ec2-user/myapi
-ExecStart=/home/ec2-user/myapi/MyAPI
+WorkingDirectory=/home/ec2-user/MyAPI
+ExecStart=/home/ec2-user/MyAPI/MyAPI
 Restart=always
 User=ec2-user
 Environment=DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
