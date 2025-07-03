@@ -1,0 +1,104 @@
+name: Build and Deploy MyApi Applications
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_PATH: "MyApi/MyApi.csproj"
+  DOTNET_VERSION: "8.0.x"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Publish
+        working-directory: MyAPI
+        run: dotnet publish ${{ env.PROJECT_PATH }} --configuration Release --output ./publish --self-contained true -r linux-x64
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Copy files to EC2 instance 1
+        working-directory: MyAPI
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+          EC2_HOST1: ${{ secrets.EC2_HOST1 }}
+        run: |
+
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "${{ secrets.EC2_HOST1 }}" >> ~/.ssh/known_hosts
+
+          echo "$EC2_SSH_KEY" > ssh_key.pem
+          chmod 600 ssh_key.pem
+
+          # Stop the service and clear the directory
+          ssh -i ssh_key.pem ${EC2_USERNAME}@${EC2_HOST1} '
+          sudo systemctl stop myapi || true
+          rm -rf ~/myapi/*
+          '
+
+          # Copy the published files
+          scp -i ssh_key.pem -r ./publish/* ${EC2_USERNAME}@${EC2_HOST1}:~/myapi/
+
+          # Copy the service file
+          scp -i ssh_key.pem ./MyApi/myapi.service ${EC2_USERNAME}@${EC2_HOST1}:~/myapi/
+
+          # Setup and start the service
+          ssh -i ssh_key.pem ${EC2_USERNAME}@${EC2_HOST1} '
+           sudo cp ~/myapi/myapi.service /etc/systemd/system/
+           sudo chmod +x ~/myapi/MyApi
+           sudo systemctl daemon-reload
+           sudo systemctl enable myapi
+           sudo systemctl restart myapi
+          '
+
+      - name: Copy files to EC2 instance 2
+        working-directory: src
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+          EC2_HOST2: ${{ secrets.EC2_HOST2 }}
+        run: |
+
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "${{ secrets.EC2_HOST2 }}" >> ~/.ssh/known_hosts
+
+          echo "$EC2_SSH_KEY" > ssh_key.pem
+          chmod 600 ssh_key.pem
+
+          # Stop the service and clear the directory
+          ssh -i ssh_key.pem ${EC2_USERNAME}@${EC2_HOST2} '
+          sudo systemctl stop myapi || true
+          rm -rf ~/myapi/*
+          '
+
+          # Copy the published files
+          scp -i ssh_key.pem -r ./publish/* ${EC2_USERNAME}@${EC2_HOST2}:~/myapi/
+
+          # Copy the service file
+          scp -i ssh_key.pem ./MyApi/myapi.service ${EC2_USERNAME}@${EC2_HOST2}:~/myapi/
+
+          # Setup and start the service
+          ssh -i ssh_key.pem ${EC2_USERNAME}@${EC2_HOST2} '
+           sudo cp ~/myapi/myapi.service /etc/systemd/system/
+           sudo chmod +x ~/myapi/MyApi
+           sudo systemctl daemon-reload
+           sudo systemctl enable myapi
+           sudo systemctl restart myapi
+          '
