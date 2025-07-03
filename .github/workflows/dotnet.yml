@@ -23,7 +23,6 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Publish
-        working-directory: MyAPI
         run: dotnet publish ${{ env.PROJECT_PATH }} --configuration Release --output ./publish --self-contained true -r linux-x64
 
       - name: Configure AWS credentials
@@ -34,7 +33,6 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Copy files to EC2 instance 1
-        working-directory: MyAPI
         env:
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
           EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
