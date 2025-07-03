@@ -1,4 +1,4 @@
-name: Build and Deploy MyApi Applications
+name: Build and Deploy MyAPI Applications
 
 on:
   push:
@@ -42,17 +42,17 @@ jobs:
           chmod 600 ssh_key.pem
           # Stop the service and clear the directory
           ssh -i ssh_key.pem $EC2_USERNAME '
-          sudo systemctl stop myapi || true
-          rm -rf ~/myapi/*
+          sudo systemctl stop MyAPI || true
+          rm -rf ~/MyAPI/*
           '
           # Copy the published files
-          scp -i ssh_key.pem -r ./publish/* $EC2_USERNAME:~/myapi/
+          scp -i ssh_key.pem -r ./publish/* $EC2_USERNAME:~/MyAPI/
           # Copy the service file
-          scp -i ssh_key.pem ./MyApi/myapi.service $EC2_USERNAME:~/myapi/
+          scp -i ssh_key.pem ./MyAPI/MyAPI.service $EC2_USERNAME:~/MyAPI/
           # Setup and start the service
           ssh -i ssh_key.pem $EC2_USERNAME '
-           sudo cp ~/myapi/myapi.service /etc/systemd/system/
-           sudo chmod +x ~/myapi/MyApi
+           sudo cp ~/MyAPI/MyAPI.service /etc/systemd/system/
+           sudo chmod +x ~/MyAPI/MyAPI
            sudo systemctl daemon-reload
-           sudo systemctl enable myapi
-           sudo systemctl restart myapi
+           sudo systemctl enable MyAPI
+           sudo systemctl restart MyAPI
