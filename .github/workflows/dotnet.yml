@@ -1,4 +1,4 @@
-name: Build and Deploy MyApi Applications
+name: Build and Deploy MyAPI Applications
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
       - main
 
 env:
-  PROJECT_PATH: "MyApi/MyApi.csproj"
+  PROJECT_PATH: "MyAPI/MyAPI.csproj"
   DOTNET_VERSION: "8.0.x"
 
 jobs:
@@ -47,23 +47,23 @@ jobs:
 
           # Stop the service and clear the directory
           ssh -i ssh_key.pem ${EC2_USERNAME}@${EC2_HOST1} '
-          sudo systemctl stop myapi || true
-          rm -rf ~/myapi/*
+          sudo systemctl stop MyAPI || true
+          rm -rf ~/MyAPI/*
           '
 
           # Copy the published files
-          scp -i ssh_key.pem -r ./publish/* ${EC2_USERNAME}@${EC2_HOST1}:~/myapi/
+          scp -i ssh_key.pem -r ./publish/* ${EC2_USERNAME}@${EC2_HOST1}:~/MyAPI/
 
           # Copy the service file
-          scp -i ssh_key.pem ./MyApi/myapi.service ${EC2_USERNAME}@${EC2_HOST1}:~/myapi/
+          scp -i ssh_key.pem ./MyAPI/MyAPI.service ${EC2_USERNAME}@${EC2_HOST1}:~/MyAPI/
 
           # Setup and start the service
           ssh -i ssh_key.pem ${EC2_USERNAME}@${EC2_HOST1} '
-           sudo cp ~/myapi/myapi.service /etc/systemd/system/
-           sudo chmod +x ~/myapi/MyApi
+           sudo cp ~/MyAPI/MyAPI.service /etc/systemd/system/
+           sudo chmod +x ~/MyAPI/MyAPI
            sudo systemctl daemon-reload
-           sudo systemctl enable myapi
-           sudo systemctl restart myapi
+           sudo systemctl enable MyAPI
+           sudo systemctl restart MyAPI
           '
 
       - name: Copy files to EC2 instance 2
@@ -82,21 +82,21 @@ jobs:
 
           # Stop the service and clear the directory
           ssh -i ssh_key.pem ${EC2_USERNAME}@${EC2_HOST2} '
-          sudo systemctl stop myapi || true
-          rm -rf ~/myapi/*
+          sudo systemctl stop MyAPI || true
+          rm -rf ~/MyAPI/*
           '
 
           # Copy the published files
-          scp -i ssh_key.pem -r ./publish/* ${EC2_USERNAME}@${EC2_HOST2}:~/myapi/
+          scp -i ssh_key.pem -r ./publish/* ${EC2_USERNAME}@${EC2_HOST2}:~/MyAPI/
 
           # Copy the service file
-          scp -i ssh_key.pem ./MyApi/myapi.service ${EC2_USERNAME}@${EC2_HOST2}:~/myapi/
+          scp -i ssh_key.pem ./MyAPI/MyAPI.service ${EC2_USERNAME}@${EC2_HOST2}:~/MyAPI/
 
           # Setup and start the service
           ssh -i ssh_key.pem ${EC2_USERNAME}@${EC2_HOST2} '
-           sudo cp ~/myapi/myapi.service /etc/systemd/system/
-           sudo chmod +x ~/myapi/MyApi
+           sudo cp ~/MyAPI/MyAPI.service /etc/systemd/system/
+           sudo chmod +x ~/MyAPI/MyAPI
            sudo systemctl daemon-reload
-           sudo systemctl enable myapi
-           sudo systemctl restart myapi
+           sudo systemctl enable MyAPI
+           sudo systemctl restart MyAPI
           '
