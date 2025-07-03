@@ -48,7 +48,7 @@ jobs:
           # Copy the published files
           scp -i ssh_key.pem -r ./publish/* $EC2_USERNAME:~/MyAPI/
           # Copy the service file
-          scp -i ssh_key.pem ./MyAPI/MyAPI.service $EC2_USERNAME:~/MyAPI/
+          scp -i ssh_key.pem ./MyAPI.service $EC2_USERNAME:~/MyAPI/
           # Setup and start the service
           ssh -i ssh_key.pem $EC2_USERNAME '
            sudo cp ~/MyAPI.service /etc/systemd/system/
