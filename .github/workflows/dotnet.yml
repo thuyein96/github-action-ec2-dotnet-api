@@ -65,38 +65,3 @@ jobs:
            sudo systemctl enable MyAPI
            sudo systemctl restart MyAPI
           '
-
-      - name: Copy files to EC2 instance 2
-        working-directory: src
-        env:
-          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
-          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
-          EC2_HOST2: ${{ secrets.EC2_HOST2 }}
-        run: |
-
-          mkdir -p ~/.ssh
-          ssh-keyscan -H "${{ secrets.EC2_HOST2 }}" >> ~/.ssh/known_hosts
-
-          echo "$EC2_SSH_KEY" > ssh_key.pem
-          chmod 600 ssh_key.pem
-
-          # Stop the service and clear the directory
-          ssh -i ssh_key.pem ${EC2_USERNAME}@${EC2_HOST2} '
-          sudo systemctl stop MyAPI || true
-          rm -rf ~/MyAPI/*
-          '
-
-          # Copy the published files
-          scp -i ssh_key.pem -r ./publish/* ${EC2_USERNAME}@${EC2_HOST2}:~/MyAPI/
-
-          # Copy the service file
-          scp -i ssh_key.pem ./MyAPI/MyAPI.service ${EC2_USERNAME}@${EC2_HOST2}:~/MyAPI/
-
-          # Setup and start the service
-          ssh -i ssh_key.pem ${EC2_USERNAME}@${EC2_HOST2} '
-           sudo cp ~/MyAPI/MyAPI.service /etc/systemd/system/
-           sudo chmod +x ~/MyAPI/MyAPI
-           sudo systemctl daemon-reload
-           sudo systemctl enable MyAPI
-           sudo systemctl restart MyAPI
-          '
