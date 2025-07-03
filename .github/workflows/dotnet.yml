@@ -41,7 +41,7 @@ jobs:
           echo "$EC2_SSH_KEY" > ssh_key.pem
           chmod 600 ssh_key.pem
           # Stop the service and clear the directory
-          ssh -i ssh_key.pem $EC2_USERNAME '
+          ssh -i ssh_key.pem ${{EC2_USERNAME}}@${{EC2_HOST1}} '
           sudo systemctl stop MyAPI || true
           rm -rf ~/MyAPI/*
           '
