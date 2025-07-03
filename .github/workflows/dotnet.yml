@@ -51,7 +51,7 @@ jobs:
           scp -i ssh_key.pem ./MyAPI/MyAPI.service $EC2_USERNAME:~/MyAPI/
           # Setup and start the service
           ssh -i ssh_key.pem $EC2_USERNAME '
-           sudo cp ~/MyAPI/MyAPI.service /etc/systemd/system/
+           sudo cp ~/MyAPI.service /etc/systemd/system/
            sudo chmod +x ~/MyAPI/MyAPI
            sudo systemctl daemon-reload
            sudo systemctl enable MyAPI
