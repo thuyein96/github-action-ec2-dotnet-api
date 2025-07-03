@@ -7,7 +7,7 @@ on:
       - main
 
 env:
-  PROJECT_PATH: "MyAPI/MyAPI.csproj"
+  PROJECT_PATH: "MyAPI.csproj"
   DOTNET_VERSION: "8.0.x"
 
 jobs:
