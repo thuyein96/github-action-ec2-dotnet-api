@@ -1,0 +1,14 @@
+[Unit]
+Description=My .NET Web App
+
+[Service]
+WorkingDirectory=/home/ec2-user/myapi
+ExecStart=/home/ec2-user/myapi/MyAPI
+Restart=always
+User=ec2-user
+Environtment=DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://*:5000
+
+[Install]
+WantedBy=multi-user.target
